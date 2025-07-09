@@ -164,6 +164,7 @@
                 <th>Room Code</th>
                 <th>Date Played</th>
                 <th>Time Played</th>
+                <th>Admin</th>
             </tr>
         </thead>
         <tbody>
@@ -223,6 +224,10 @@ async function loadScores() {
             const timeCell = document.createElement('td');
             timeCell.innerText = datePlayed.toLocaleTimeString('th-TH');  // แสดงเวลาในประเทศไทย
 
+            // สร้างเซลล์สำหรับ Admin
+            const adminCell = document.createElement('td');
+            adminCell.innerText = score.adminUsername || 'N/A';
+
             // เพิ่มเซลล์ทั้งหมดในแถว
             row.appendChild(nameCell);
             row.appendChild(scoreCell);
@@ -230,6 +235,7 @@ async function loadScores() {
             row.appendChild(roomCodeCell);
             row.appendChild(dateCell);
             row.appendChild(timeCell);
+            row.appendChild(adminCell);
 
             // เพิ่มแถวใหม่เข้าไปในตาราง
             tbody.appendChild(row);

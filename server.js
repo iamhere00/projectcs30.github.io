@@ -385,8 +385,22 @@ app.get('/quiz', async (req, res) => {
 // เส้นทางสำหรับดึงคะแนนผู้เล่นทั้งหมดพร้อม Room Code
 app.get('/scores', async (req, res) => {
     try {
-        const scores = await PlayerScore.find().sort({ datePlayed: -1 }); // เรียงตามวันที่ล่าสุด
-        res.json(scores);
+        const scores = await PlayerScore.find().sort({ datePlayed: -1 });
+
+        // ดึง RoomCodes ทั้งหมดที่ใช้ในคะแนน
+        const roomCodes = await RoomCode.find({}, 'roomCode adminUsername');
+        const roomCodeMap = {};
+        roomCodes.forEach(room => {
+            roomCodeMap[room.roomCode] = room.adminUsername;
+        });
+
+        // เพิ่ม adminUsername เข้าไปในแต่ละ score
+        const updatedScores = scores.map(score => ({
+            ...score.toObject(),
+            adminUsername: roomCodeMap[score.roomCode] || 'Unknown'
+        }));
+
+        res.json(updatedScores);
     } catch (error) {
         console.error('Error fetching scores:', error);
         res.status(500).send('Error fetching scores');
@@ -1307,13 +1321,28 @@ app.get('/quiz2', async (req, res) => {
 // เส้นทางสำหรับดึงคะแนนผู้เล่นทั้งหมดพร้อม Room Code
 app.get('/scores2', async (req, res) => {
     try {
-        const scores = await PlayerScore2.find().sort({ datePlayed: -1 }); // เรียงตามวันที่ล่าสุด
-        res.json(scores);
+        const scores = await PlayerScore2.find().sort({ datePlayed: -1 });
+
+        // ดึง RoomCodes ทั้งหมดที่ใช้ในคะแนน
+        const roomCodes = await RoomCode2.find({}, 'roomCode adminUsername');
+        const roomCodeMap = {};
+        roomCodes.forEach(room => {
+            roomCodeMap[room.roomCode] = room.adminUsername;
+        });
+
+        // เพิ่ม adminUsername เข้าไปในแต่ละ score
+        const updatedScores = scores.map(score => ({
+            ...score.toObject(),
+            adminUsername: roomCodeMap[score.roomCode] || 'Unknown'
+        }));
+
+        res.json(updatedScores);
     } catch (error) {
         console.error('Error fetching scores:', error);
         res.status(500).send('Error fetching scores');
     }
 });
+
 
 // ดึง RoomCode ทั้งหมด
 app.get('/roomcodes2', async (req, res) => {
