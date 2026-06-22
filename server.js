@@ -233,7 +233,7 @@ const transporter = nodemailer.createTransport({
 const upload = multer({ dest: 'uploads/' });
 
 function sendOTP(email, otp) {
-    onsole.log("Inside sendOTP");
+    console.log("Inside sendOTP");
     const mailOptions = {
         from: 'feelbbfeel@gmail.com',
         to: email,
