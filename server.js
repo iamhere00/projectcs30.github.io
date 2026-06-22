@@ -224,8 +224,8 @@ const corsOptions = {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'feelbbfeel@gmail.com', // กรอก Gmail ของคุณ
-        pass: 'sezu vchr cbbk bwuh'   // กรอกรหัสผ่านหรือ app password
+        user: 'forworkisme@gmail.com', // กรอก Gmail ของคุณ
+        pass: 'hzvz fymd sgrh msyp'   // กรอกรหัสผ่านหรือ app password
     }
 });
 
@@ -235,7 +235,7 @@ const upload = multer({ dest: 'uploads/' });
 function sendOTP(email, otp) {
     console.log("Inside sendOTP");
     const mailOptions = {
-        from: 'feelbbfeel@gmail.com',
+        from: 'forworkisme@gmail.com',
         to: email,
         subject: 'Your OTP code for resetting website passwordWebsite for Evaluating Programming andAlgorithmic Expertise Using C++',
         text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`
