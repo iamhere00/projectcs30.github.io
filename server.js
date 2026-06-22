@@ -234,7 +234,7 @@ const upload = multer({ dest: 'uploads/' });
 
 function sendOTP(email, otp) {
     const mailOptions = {
-        from: 'your-email@gmail.com',
+        from: 'feelbbfeel@gmail.com',
         to: email,
         subject: 'Your OTP code for resetting website passwordWebsite for Evaluating Programming andAlgorithmic Expertise Using C++',
         text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`
