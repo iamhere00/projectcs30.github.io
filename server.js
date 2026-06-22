@@ -229,25 +229,34 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// ทดสอบการเชื่อมต่อ Gmail SMTP
+transporter.verify((err, success) => {
+    if (err) {
+        console.error("VERIFY ERROR:", err);
+    } else {
+        console.log("SMTP READY");
+    }
+});
+
 // ตั้งค่าการอัปโหลดไฟล์
 const upload = multer({ dest: 'uploads/' });
 
-function sendOTP(email, otp) {
-    console.log("Inside sendOTP");
+async function sendOTP(email, otp) {
     const mailOptions = {
         from: 'forworkisme@gmail.com',
         to: email,
-        subject: 'Your OTP code for resetting website passwordWebsite for Evaluating Programming andAlgorithmic Expertise Using C++',
-        text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`
+        subject: 'OTP Verification',
+        text: `Your OTP code is: ${otp}`
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log('Error sending OTP:', error);
-        } else {
-            console.log('OTP sent:', info.response);
-        }
-    });
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log("SUCCESS:", info);
+        return true;
+    } catch (err) {
+        console.error("SEND MAIL ERROR:", err);
+        throw err;
+    }
 }
 
 app.use(cors(corsOptions));
@@ -952,7 +961,7 @@ app.post('/send-otp', async (req, res) => {
         await otpDoc.save();
 
         // ส่ง OTP ไปยัง email
-        sendOTP(email, otp);
+        await sendOTP(email, otp);
         res.status(200).send('OTP sent');
     } catch (error) {
         console.error('Error sending OTP:', error);
