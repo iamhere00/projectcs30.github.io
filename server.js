@@ -225,7 +225,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'feelbbfeel@gmail.com', // กรอก Gmail ของคุณ
-        pass: 'kalc askp mhgw adwi'   // กรอกรหัสผ่านหรือ app password
+        pass: 'sezu vchr cbbk bwuh'   // กรอกรหัสผ่านหรือ app password
     }
 });
 
