@@ -963,33 +963,22 @@ app.post('/send-otp', async (req, res) => {
             return res.status(400).send('Email does not match the one on record');
         }
 
-// สร้าง OTP
-const otp = otpGenerator.generate(6, {
-    upperCase: false,
-    specialChars: false
-});
+        // สร้าง OTP
+        const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
-const expiresAt = new Date();
-expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+        // บันทึก OTP ในฐานข้อมูล
+        const otpDoc = new OTP({ username: user.username, otp, expiresAt });
+        await otpDoc.save();
 
-try {
-    // ส่งอีเมลก่อน
-    await sendOTP(email, otp);
-
-    // ถ้าส่งสำเร็จจึงบันทึก OTP
-    await OTP.create({
-        username: user.username,
-        otp,
-        expiresAt
-    });
-
-    res.status(200).send('OTP sent successfully');
-
-} catch (error) {
-    console.error("OTP PROCESS ERROR:", error);
-
-    res.status(500).send('Unable to send OTP email');
-}
+        // ส่ง OTP ไปยัง email
+        await sendOTP(email, otp);
+        res.status(200).send('OTP sent');
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).send('Error sending OTP');
+    }
 });
 
 // Endpoint สำหรับดึงประวัติทั้งหมดของผู้ใช้
