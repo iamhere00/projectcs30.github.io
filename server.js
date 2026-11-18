@@ -243,7 +243,7 @@ const upload = multer({ dest: 'uploads/' });
 
 async function sendOTP(email, otp) {
     const mailOptions = {
-        from: 'forworkisme@gmail.com',
+        from: '"Quiz System" <forworkisme@gmail.com>',
         to: email,
         subject: 'OTP Verification',
         text: `Your OTP code is: ${otp}`
@@ -251,10 +251,22 @@ async function sendOTP(email, otp) {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log("SUCCESS:", info);
+
+        console.log("EMAIL SENT:", {
+            messageId: info.messageId,
+            accepted: info.accepted,
+            rejected: info.rejected,
+            response: info.response
+        });
+
+        if (info.rejected && info.rejected.length > 0) {
+            throw new Error("Email was rejected by recipient server");
+        }
+
         return true;
+
     } catch (err) {
-        console.error("SEND MAIL ERROR:", err);
+        console.error("SEND MAIL ERROR:", err.message);
         throw err;
     }
 }
@@ -951,22 +963,33 @@ app.post('/send-otp', async (req, res) => {
             return res.status(400).send('Email does not match the one on record');
         }
 
-        // สร้าง OTP
-        const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false });
-        const expiresAt = new Date();
-        expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+// สร้าง OTP
+const otp = otpGenerator.generate(6, {
+    upperCase: false,
+    specialChars: false
+});
 
-        // บันทึก OTP ในฐานข้อมูล
-        const otpDoc = new OTP({ username: user.username, otp, expiresAt });
-        await otpDoc.save();
+const expiresAt = new Date();
+expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
-        // ส่ง OTP ไปยัง email
-        await sendOTP(email, otp);
-        res.status(200).send('OTP sent');
-    } catch (error) {
-        console.error('Error sending OTP:', error);
-        res.status(500).send('Error sending OTP');
-    }
+try {
+    // ส่งอีเมลก่อน
+    await sendOTP(email, otp);
+
+    // ถ้าส่งสำเร็จจึงบันทึก OTP
+    await OTP.create({
+        username: user.username,
+        otp,
+        expiresAt
+    });
+
+    res.status(200).send('OTP sent successfully');
+
+} catch (error) {
+    console.error("OTP PROCESS ERROR:", error);
+
+    res.status(500).send('Unable to send OTP email');
+}
 });
 
 // Endpoint สำหรับดึงประวัติทั้งหมดของผู้ใช้
